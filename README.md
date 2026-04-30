@@ -672,10 +672,23 @@ Este proyecto implementa **Arquitectura Hexagonal (Ports and Adapters)** con pri
 ## ⚙️ CONFIGURACIÓN (application.properties)
 
 ```properties
-server.port=8080                    # Puerto del servidor
-spring.h2.console.enabled=true      # Activa la consola H2
-app.jwt.expiration-ms=86400000      # Token expira en 24 horas
-app.transfer.approval-threshold=5000.00  # Umbral de aprobación: $5,000
+spring.application.name=bank-hexagonal
+
+# Base de datos (ejemplo con PostgreSQL — cambia a MySQL o H2 según necesites)
+spring.datasource.url=jdbc:postgresql://localhost:5432/bankdb
+spring.datasource.username=postgres
+spring.datasource.password=0000
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+# JWT Configuration
+app.jwt.secret=unaClaveSecretaMuyLargaYSeguraDeAlMenos256BitsParaHS256
+app.jwt.expiration-ms=86400000
+app.transfer.approval-threshold=2000000
 ```
 
 ---
@@ -695,3 +708,62 @@ mvn spring-boot:run
 ```
 
 En Postman: `POST http://localhost:8080/api/auth/login` con `ANA001` / `analyst123`
+
+
+
+# 🗄️ Documentación de la Base de Datos - Bank System
+
+Este documento describe la estructura y configuración de la base de datos PostgreSQL utilizada en el sistema bancario.
+
+## ⚙️ Configuración de Conexión
+La aplicación utiliza **Spring Data JPA** con Hibernate para la gestión del ORM. Los parámetros exactos de conexión para este entorno son:
+
+- **Motor:** PostgreSQL
+- **Host:** `localhost`
+- **Puerto:** `5432`
+- **Base de Datos:** `bank_db`
+- **Usuario:** `postgres` (por defecto)
+- **Contraseña:** `0000` 🔑
+- **Modo DDL:** `update` (las tablas se crean automáticamente al iniciar la app)
+
+---
+
+## 📊 Diccionario de Datos (Entidades Principales)
+
+### 1. Tabla: `users`
+Almacena la información de acceso y roles para Clientes y Analistas.
+*   **id**: (PK) BigInt Autoincremental.
+*   **identification_number**: String/Varchar (Ej: "CLI001", "ANA001").
+*   **full_name**: String.
+*   **password**: String (BCrypt encoded).
+*   **role**: Enum (`INTERNAL_ANALYST`, `CLIENT`).
+
+### 2. Tabla: `accounts`
+Almacena el estado financiero de los usuarios.
+*   **id**: (PK) BigInt.
+*   **account_number**: String único (Ej: "ACC0000000001").
+*   **balance**: Decimal/Numeric (Saldo disponible).
+*   **status**: Enum (`ACTIVE`, `INACTIVE`, `BLOCKED`).
+*   **user_id**: (FK) Relación con la tabla `users`.
+
+### 3. Tabla: `transfers`
+Registro histórico de movimientos de dinero.
+*   **id**: (PK) UUID o BigInt.
+*   **source_account**: String (Número de cuenta origen).
+*   **destination_account**: String (Número de cuenta destino).
+*   **amount**: Decimal (Monto transferido).
+*   **timestamp**: DateTime (Fecha y hora de la operación).
+*   **status**: String (Ej: "SUCCESSFUL", "FAILED").
+
+---
+
+## 🛠️ Herramientas de Gestión Recomendadas
+Para administrar y visualizar estos datos, se recomienda el uso de:
+1. **pgAdmin 4**: Herramienta oficial para PostgreSQL.
+2. **DBeaver**: Cliente universal de bases de datos.
+
+## 🧪 Datos Iniciales (Seeder)
+Al arrancar la aplicación por primera vez, el archivo `DataSeeder.java` insertará automáticamente los datos de prueba necesarios para usar en Postman.
+
+---
+*Última actualización: Abril 2026*
