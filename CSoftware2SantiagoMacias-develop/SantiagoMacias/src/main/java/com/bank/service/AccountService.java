@@ -43,6 +43,10 @@ public class AccountService {
 
     /**
      * Inyección de dependencias para testing
+     * @param creationService servicio de creación de cuentas
+     * @param operationService servicio de operaciones bancarias
+     * @param managementService servicio de gestión de cuentas
+     * @param queryService servicio de consultas de cuentas
      */
     public AccountService(AccountCreationService creationService,
                           AccountOperationService operationService,
