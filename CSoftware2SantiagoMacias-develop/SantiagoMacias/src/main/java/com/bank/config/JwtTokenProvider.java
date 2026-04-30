@@ -24,7 +24,7 @@ public class JwtTokenProvider {
 
     public Long getUserIdFromToken(String token) {
         Object id = getClaims(token).get("userId");
-        if (id instanceof Integer) return ((Integer) id).longValue();
+        if (id instanceof Integer intValue) return intValue.longValue();
         return (Long) id;
     }
 

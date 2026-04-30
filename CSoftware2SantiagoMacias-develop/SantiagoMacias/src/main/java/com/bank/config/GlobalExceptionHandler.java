@@ -1,7 +1,7 @@
 package com.bank.config;
 
-import com.bank.application.dto.BankingDto.ApiResponse;
-import com.bank.domain.exception.*;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -9,7 +9,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.stream.Collectors;
+import com.bank.application.dto.BankingDto.ApiResponse;
+import com.bank.domain.exception.AccessDeniedException;
+import com.bank.domain.exception.AccountOperationNotAllowedException;
+import com.bank.domain.exception.DomainValidationException;
+import com.bank.domain.exception.InsufficientFundsException;
+import com.bank.domain.exception.InvalidLoanStateTransitionException;
+import com.bank.domain.exception.InvalidTransferStateException;
+import com.bank.domain.exception.ResourceNotFoundException;
 
 /**
  * CONFIG - GlobalExceptionHandler
@@ -47,7 +54,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InsufficientFundsException.class)
     public ResponseEntity<ApiResponse<Void>> handleInsufficientFunds(InsufficientFundsException ex) {
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+        return ResponseEntity.status(422)
             .body(ApiResponse.error(ex.getMessage()));
     }
 

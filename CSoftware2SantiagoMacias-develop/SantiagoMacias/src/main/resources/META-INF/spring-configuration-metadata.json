@@ -1,0 +1,41 @@
+{
+  "groups": [
+    {
+      "name": "app",
+      "type": "com.bank.config.ApplicationProperties",
+      "sourceType": "com.bank.config.ApplicationProperties"
+    },
+    {
+      "name": "app.jwt",
+      "type": "com.bank.config.ApplicationProperties$Jwt",
+      "sourceType": "com.bank.config.ApplicationProperties",
+      "sourceMethod": "getJwt()"
+    },
+    {
+      "name": "app.transfer",
+      "type": "com.bank.config.ApplicationProperties$Transfer",
+      "sourceType": "com.bank.config.ApplicationProperties",
+      "sourceMethod": "getTransfer()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT secret key for signing tokens",
+      "sourceType": "com.bank.config.ApplicationProperties$Jwt"
+    },
+    {
+      "name": "app.jwt.expiration-ms",
+      "type": "java.lang.Long",
+      "description": "JWT token expiration time in milliseconds",
+      "sourceType": "com.bank.config.ApplicationProperties$Jwt"
+    },
+    {
+      "name": "app.transfer.approval-threshold",
+      "type": "java.math.BigDecimal",
+      "description": "Threshold amount for transfer approval",
+      "sourceType": "com.bank.config.ApplicationProperties$Transfer"
+    }
+  ]
+}

@@ -10,47 +10,48 @@ import java.util.Optional;
 /**
  * FACADE SERVICE — Orquestador de operaciones de cuentas (DDD)
  * 
- * Esta clase actúa como Facade que delega a UseCase especializados:
- * - CreateAccountUseCase: Creación de cuentas
- * - DepositWithdrawUseCase: Depósitos y retiros
- * - BlockAccountUseCase: Bloqueo de cuentas
- * - RetrieveAccountUseCase: Consultas de cuentas
+ * Esta clase actúa como Facade que coordina servicios especializados:
+ * - AccountCreationService: Creación de cuentas
+ * - AccountOperationService: Depósitos y retiros
+ * - AccountManagementService: Bloqueo de cuentas
+ * - AccountQueryService: Consultas de cuentas
  * 
  * Mantiene compatibilidad con la interfaz anterior.
  */
 public class AccountService {
 
-    private final CreateAccountUseCase createAccountUseCase;
-    private final DepositWithdrawUseCase depositWithdrawUseCase;
-    private final BlockAccountUseCase blockAccountUseCase;
-    private final RetrieveAccountUseCase retrieveAccountUseCase;
+    private final AccountCreationService creationService;
+    private final AccountOperationService operationService;
+    private final AccountManagementService managementService;
+    private final AccountQueryService queryService;
 
     public AccountService() {
         AccountRepository accountRepo = new SqliteAccountRepository();
         UserRepository userRepo = new SqliteUserRepository();
         DomainEventPublisher eventPublisher = new AuditLogRepository();
 
-        this.createAccountUseCase = new CreateAccountUseCase(accountRepo, userRepo, eventPublisher);
-        this.depositWithdrawUseCase = new DepositWithdrawUseCase(accountRepo, eventPublisher);
-        this.blockAccountUseCase = new BlockAccountUseCase(accountRepo, eventPublisher);
-        this.retrieveAccountUseCase = new RetrieveAccountUseCase(accountRepo);
+        CreateAccountUseCase createAccountUseCase = new CreateAccountUseCase(accountRepo, userRepo, eventPublisher);
+        DepositWithdrawUseCase depositWithdrawUseCase = new DepositWithdrawUseCase(accountRepo, eventPublisher);
+        BlockAccountUseCase blockAccountUseCase = new BlockAccountUseCase(accountRepo, eventPublisher);
+        RetrieveAccountUseCase retrieveAccountUseCase = new RetrieveAccountUseCase(accountRepo);
+
+        this.creationService = new AccountCreationService(createAccountUseCase);
+        this.operationService = new AccountOperationService(depositWithdrawUseCase);
+        this.managementService = new AccountManagementService(blockAccountUseCase);
+        this.queryService = new AccountQueryService(retrieveAccountUseCase);
     }
 
     /**
      * Inyección de dependencias para testing
-     * @param createAccountUseCase caso de uso de creación de cuentas
-     * @param depositWithdrawUseCase caso de uso de depósitos y retiros
-     * @param blockAccountUseCase caso de uso de bloqueo de cuentas
-     * @param retrieveAccountUseCase caso de uso de consulta de cuentas
      */
-    public AccountService(CreateAccountUseCase createAccountUseCase,
-                          DepositWithdrawUseCase depositWithdrawUseCase,
-                          BlockAccountUseCase blockAccountUseCase,
-                          RetrieveAccountUseCase retrieveAccountUseCase) {
-        this.createAccountUseCase = createAccountUseCase;
-        this.depositWithdrawUseCase = depositWithdrawUseCase;
-        this.blockAccountUseCase = blockAccountUseCase;
-        this.retrieveAccountUseCase = retrieveAccountUseCase;
+    public AccountService(AccountCreationService creationService,
+                          AccountOperationService operationService,
+                          AccountManagementService managementService,
+                          AccountQueryService queryService) {
+        this.creationService = creationService;
+        this.operationService = operationService;
+        this.managementService = managementService;
+        this.queryService = queryService;
     }
 
     /**
@@ -61,7 +62,7 @@ public class AccountService {
      * @return BankAccount la cuenta creada
      */
     public BankAccount openAccount(String ownerIdentification, AccountType accountType, String currency) {
-        return createAccountUseCase.execute(ownerIdentification, accountType, currency);
+        return creationService.openAccount(ownerIdentification, accountType, currency);
     }
 
     /**
@@ -70,7 +71,7 @@ public class AccountService {
      * @param amount monto a depositar
      */
     public void deposit(String accountNumber, java.math.BigDecimal amount) {
-        depositWithdrawUseCase.deposit(accountNumber, amount);
+        operationService.deposit(accountNumber, amount);
     }
 
     /**
@@ -79,7 +80,7 @@ public class AccountService {
      * @param amount monto a retirar
      */
     public void withdraw(String accountNumber, java.math.BigDecimal amount) {
-        depositWithdrawUseCase.withdraw(accountNumber, amount);
+        operationService.withdraw(accountNumber, amount);
     }
 
     /**
@@ -87,7 +88,7 @@ public class AccountService {
      * @param accountNumber número de cuenta a bloquear
      */
     public void blockAccount(String accountNumber) {
-        blockAccountUseCase.execute(accountNumber);
+        managementService.blockAccount(accountNumber);
     }
 
     /**
@@ -96,7 +97,7 @@ public class AccountService {
      * @return Optional con la cuenta si existe
      */
     public Optional<BankAccount> getAccount(String accountNumber) {
-        return retrieveAccountUseCase.getAccountByNumber(accountNumber);
+        return queryService.getAccount(accountNumber);
     }
 
     /**
@@ -105,7 +106,7 @@ public class AccountService {
      * @return Lista de cuentas del propietario
      */
     public List<BankAccount> getAccountsByOwner(String ownerIdentification) {
-        return retrieveAccountUseCase.getAccountsByOwner(ownerIdentification);
+        return queryService.getAccountsByOwner(ownerIdentification);
     }
 
     /**
@@ -113,7 +114,7 @@ public class AccountService {
      * @return Lista de todas las cuentas
      */
     public List<BankAccount> getAllAccounts() {
-        return retrieveAccountUseCase.getAllAccounts();
+        return queryService.getAllAccounts();
     }
 
     /**
@@ -122,6 +123,6 @@ public class AccountService {
      * @return BankAccount la cuenta solicitada
      */
     public BankAccount loadAccount(String accountNumber) {
-        return retrieveAccountUseCase.loadAccount(accountNumber);
+        return queryService.loadAccount(accountNumber);
     }
 }

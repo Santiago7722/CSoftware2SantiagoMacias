@@ -13,11 +13,9 @@ import java.util.Optional;
 public class RetrieveAccountUseCase {
 
     private final AccountRepository accountRepository;
-    private final UserRepository userRepository;
 
     public RetrieveAccountUseCase(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
-        this.userRepository = null;
     }
 
     /**

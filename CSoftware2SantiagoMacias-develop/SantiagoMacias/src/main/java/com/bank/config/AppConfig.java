@@ -3,6 +3,7 @@ package com.bank.config;
 import com.bank.domain.service.LoanDisbursementDomainService;
 import com.bank.domain.service.TransferDomainService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
  * Domain services are pure Java — they just need their parameters injected here.
  */
 @Configuration
+@EnableConfigurationProperties(ApplicationProperties.class)
 public class AppConfig {
 
     @Value("${app.transfer.approval-threshold}")
