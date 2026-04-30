@@ -1,11 +1,20 @@
 package com.bank.service;
 
-import com.bank.model.*;
-import com.bank.repository.*;
-import com.bank.application.usecase.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.bank.application.usecase.BlockAccountUseCase;
+import com.bank.application.usecase.CreateAccountUseCase;
+import com.bank.application.usecase.DepositWithdrawUseCase;
+import com.bank.application.usecase.RetrieveAccountUseCase;
+import com.bank.model.AccountType;
+import com.bank.model.BankAccount;
+import com.bank.repository.AccountRepository;
+import com.bank.repository.AuditLogRepository;
+import com.bank.repository.DomainEventPublisher;
+import com.bank.repository.SqliteAccountRepository;
+import com.bank.repository.SqliteUserRepository;
+import com.bank.repository.UserRepository;
 
 /**
  * FACADE SERVICE — Orquestador de operaciones de cuentas (DDD)
