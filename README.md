@@ -148,7 +148,7 @@ Started BankApplication in X.XXX seconds (JVM running for X.XXX)
 2. Abre Postman
 3. Clic en **Import** (esquina superior izquierda)
 4. Selecciona la pestaña **Link**
-5. Pega: `http://localhost:8080/api-docs`
+5. Pega: `http://localhost:8080/v3/api-docs`
 6. Clic **Continue → Import**
 
 Postman importará automáticamente todos los endpoints con sus parámetros.
