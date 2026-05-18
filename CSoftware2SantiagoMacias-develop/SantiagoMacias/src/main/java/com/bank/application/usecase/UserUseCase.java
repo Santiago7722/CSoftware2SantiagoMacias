@@ -10,7 +10,6 @@ import com.bank.domain.model.entity.User;
 import com.bank.domain.model.valueobject.UserRole;
 import com.bank.shared.SecurityContextHelper;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -134,13 +133,13 @@ public class UserUseCase implements UserInputPort {
     private String generateJwtToken(User user) {
         Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-            .setSubject(user.getIdentificationNumber())
+            .subject(user.getIdentificationNumber())
             .claim("userId", user.getId())
             .claim("role", user.getRole().name())
             .claim("fullName", user.getFullName())
-            .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-            .signWith(key, SignatureAlgorithm.HS256)
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+            .signWith(key)
             .compact();
     }
 
